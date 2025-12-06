@@ -3,27 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import { Sphere, Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
-declare module 'react' {
-  namespace JSX {
-    interface IntrinsicElements {
-      group: any;
-      mesh: any;
-      ambientLight: any;
-      pointLight: any;
-      spotLight: any;
-      sphereGeometry: any;
-      boxGeometry: any;
-      cylinderGeometry: any;
-      planeGeometry: any;
-      coneGeometry: any;
-      ringGeometry: any;
-      meshStandardMaterial: any;
-      meshBasicMaterial: any;
-      shaderMaterial: any;
-    }
-  }
-}
-
 const SolarSystem = () => {
     const groupRef = useRef<THREE.Group>(null!);
 

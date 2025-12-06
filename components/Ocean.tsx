@@ -2,27 +2,6 @@ import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-declare module 'react' {
-  namespace JSX {
-    interface IntrinsicElements {
-      group: any;
-      mesh: any;
-      ambientLight: any;
-      pointLight: any;
-      spotLight: any;
-      sphereGeometry: any;
-      boxGeometry: any;
-      cylinderGeometry: any;
-      planeGeometry: any;
-      coneGeometry: any;
-      ringGeometry: any;
-      meshStandardMaterial: any;
-      meshBasicMaterial: any;
-      shaderMaterial: any;
-    }
-  }
-}
-
 const WaterShaderMaterial = {
     uniforms: {
         uTime: { value: 0 },
