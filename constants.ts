@@ -42,6 +42,20 @@ export const GAMES: GameItem[] = [
     description: 'Ultra-realistic 3D butterfly odyssey with dynamic worlds.',
     thumbnail: 'https://images.unsplash.com/photo-1463107971871-fbac9ddb920f?auto=format&fit=crop&q=80&w=400',
     category: 'Arcade'
+  },
+  {
+    id: '7',
+    title: 'Neuro-Snake',
+    description: 'Cognitive Labyrinth with reverse controls and warp gates.',
+    thumbnail: 'https://images.unsplash.com/photo-1628277613967-6bc3d4505f11?auto=format&fit=crop&q=80&w=400',
+    category: 'Puzzle'
+  },
+  {
+    id: '8',
+    title: 'Kinetic Reflex',
+    description: 'Precision bounce with physics anomalies and time warping.',
+    thumbnail: 'https://images.unsplash.com/photo-1519810755548-392116d9a642?auto=format&fit=crop&q=80&w=400',
+    category: 'Arcade'
   }
 ];
 

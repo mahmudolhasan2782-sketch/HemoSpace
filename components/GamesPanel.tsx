@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GAMES } from '../constants';
 import { X, Play, ArrowLeft, Gamepad, Maximize } from 'lucide-react';
-import { ElevateGame, PeakGame, MonumentGame, NeuroNationGame, ImpulseGame, HemoFlyGame } from './MiniGames';
+import { ElevateGame, PeakGame, MonumentGame, NeuroNationGame, ImpulseGame, HemoFlyGame, NeuroSnakeGame, KineticReflexGame } from './MiniGames';
 
 interface Props {
   isOpen: boolean;
@@ -20,6 +20,8 @@ const GamesPanel: React.FC<Props> = ({ isOpen, onClose }) => {
           case '4': return <NeuroNationGame />;
           case '5': return <ImpulseGame />;
           case '6': return <HemoFlyGame />;
+          case '7': return <NeuroSnakeGame />;
+          case '8': return <KineticReflexGame />;
           default: return <div className="text-white">Loading...</div>;
       }
   };

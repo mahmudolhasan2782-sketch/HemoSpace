@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Zap, Target, Layers, Box, Gem, Star, RotateCcw, CheckCircle, Bug } from 'lucide-react';
+import { Brain, Zap, Target, Layers, Box, Gem, Star, RotateCcw, CheckCircle, Bug, Ghost, RefreshCw, Magnet, Wind } from 'lucide-react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, Stars as DreiStars, Float, Sparkles, Trail, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -545,13 +545,11 @@ const ButterflyWing = ({ shape, color, ...props }: any) => {
   const wingShape = useMemo(() => {
     const s = new THREE.Shape();
     if (shape === 'fore') {
-      // Realistic Forewing shape
       s.moveTo(0, 0);
       s.bezierCurveTo(0.2, 0.5, 0.8, 1.2, 1.8, 0.8);
       s.bezierCurveTo(2.2, 0.4, 2.0, -0.4, 1.0, -0.8);
       s.lineTo(0, 0);
     } else {
-      // Realistic Hindwing shape
       s.moveTo(0, 0);
       s.bezierCurveTo(0.5, -0.2, 1.2, -0.8, 0.8, -1.8);
       s.bezierCurveTo(0.2, -2.2, -0.5, -1.2, 0, 0);
@@ -587,18 +585,11 @@ const Butterfly = ({ position }: any) => {
     useFrame((state) => {
         const t = state.clock.getElapsedTime();
         if (group.current) {
-             // Natural hover/bobbing
              group.current.position.y = position[1] + Math.sin(t * 3) * 0.2;
              group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, position[0], 0.1);
-             
-             // Banking/Rolling when moving side to side
              const targetRoll = (position[0] - group.current.position.x) * -0.5;
              group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, targetRoll, 0.1);
-
-             // Wing flap animation
-             const wingAngle = Math.sin(t * 20) * 0.8; // Faster, more intense flutter
-             
-             // Wings are children indices: 2 (Left Group) and 3 (Right Group)
+             const wingAngle = Math.sin(t * 20) * 0.8; 
              if(group.current.children[2]) group.current.children[2].rotation.z = wingAngle; 
              if(group.current.children[3]) group.current.children[3].rotation.z = -wingAngle; 
         }
@@ -606,21 +597,14 @@ const Butterfly = ({ position }: any) => {
 
     return (
         <group ref={group} position={position} scale={0.4}>
-            {/* --- ANATOMY --- */}
-            
-            {/* Thorax (Center Body) */}
             <mesh rotation={[Math.PI / 2, 0, 0]}>
                 <capsuleGeometry args={[0.15, 0.6, 8, 16]} />
                 <meshStandardMaterial color={bodyColor} roughness={0.8} />
             </mesh>
-            
-            {/* Head */}
             <mesh position={[0, 0.45, 0]}>
                 <sphereGeometry args={[0.12, 16, 16]} />
                 <meshStandardMaterial color={bodyColor} roughness={0.5} />
             </mesh>
-            
-            {/* Eyes */}
             <mesh position={[0.08, 0.48, 0.05]}>
                 <sphereGeometry args={[0.04, 8, 8]} />
                 <meshStandardMaterial color="black" roughness={0} metalness={0.8} />
@@ -629,14 +613,10 @@ const Butterfly = ({ position }: any) => {
                 <sphereGeometry args={[0.04, 8, 8]} />
                 <meshStandardMaterial color="black" roughness={0} metalness={0.8} />
             </mesh>
-
-            {/* Abdomen (Tail) */}
             <mesh position={[0, -0.6, 0]} rotation={[Math.PI / 2, 0, 0]}>
                 <capsuleGeometry args={[0.12, 0.8, 8, 16]} />
                 <meshStandardMaterial color={bodyColor} roughness={0.9} />
             </mesh>
-
-            {/* Antennae */}
             <group position={[0, 0.5, 0.1]}>
                  <mesh position={[0.1, 0.3, 0]} rotation={[0, 0, -0.2]}>
                      <cylinderGeometry args={[0.01, 0.02, 0.6]} />
@@ -647,28 +627,18 @@ const Butterfly = ({ position }: any) => {
                      <meshStandardMaterial color="black" />
                  </mesh>
             </group>
-
-            {/* --- WINGS --- */}
-            
-            {/* Left Wing Group */}
             <group position={[-0.1, 0, 0.1]} rotation={[0.2, 0.2, 0]}>
                 <ButterflyWing shape="fore" color={wingColor} position={[-0.2, 0.2, 0]} rotation={[0, 0, 2.5]} scale={1.5} />
                 <ButterflyWing shape="hind" color={wingColor} position={[-0.3, -0.5, 0]} rotation={[0, 0, 2]} scale={1.2} />
-                 {/* Trails for effect */}
                 <Trail width={0.4} length={3} color={new THREE.Color(veinColor)} attenuation={(t) => t * t} target={undefined} />
             </group>
-
-            {/* Right Wing Group */}
             <group position={[0.1, 0, 0.1]} rotation={[0.2, -0.2, 0]}>
-                {/* We flip the scale X for mirroring */}
                 <group scale={[-1, 1, 1]}>
                     <ButterflyWing shape="fore" color={wingColor} position={[-0.2, 0.2, 0]} rotation={[0, 0, 2.5]} scale={1.5} />
                     <ButterflyWing shape="hind" color={wingColor} position={[-0.3, -0.5, 0]} rotation={[0, 0, 2]} scale={1.2} />
                 </group>
                 <Trail width={0.4} length={3} color={new THREE.Color(veinColor)} attenuation={(t) => t * t} target={undefined} />
             </group>
-
-            {/* Magic Sparkles around body */}
             <Sparkles count={15} scale={1.5} size={1} speed={0.4} opacity={0.8} color="#ff00ff" />
         </group>
     );
@@ -681,7 +651,6 @@ const World = ({ level, onCollide, onCollect }: any) => {
     const colorTheme = level > 10 ? (level > 15 ? "#ff0000" : "#bd00ff") : "#00ffff";
 
     useFrame((state, delta) => {
-        // Move obstacles towards camera
         if (obstaclesRef.current) {
             obstaclesRef.current.children.forEach((child: any) => {
                 child.position.z += delta * speed;
@@ -690,27 +659,22 @@ const World = ({ level, onCollide, onCollect }: any) => {
                     child.position.x = (Math.random() - 0.5) * 10;
                     child.position.y = (Math.random() - 0.5) * 8;
                 }
-                // Collision
                 if (child.position.z > 0 && child.position.z < 1 && Math.abs(child.position.x) < 1 && Math.abs(child.position.y) < 1) {
                     onCollide();
                 }
             });
         }
-        // Move pollens
         if (pollensRef.current) {
              pollensRef.current.children.forEach((child: any) => {
                 child.position.z += delta * speed;
-                // Spin
                 child.rotation.y += delta;
                 child.rotation.z += delta;
-
                 if (child.position.z > 5) {
                     child.position.z = -50 - Math.random() * 50;
                     child.position.x = (Math.random() - 0.5) * 10;
                     child.position.y = (Math.random() - 0.5) * 8;
                     child.visible = true;
                 }
-                // Collection
                 if (child.visible && child.position.z > 0 && child.position.z < 1 && Math.abs(child.position.x) < 1 && Math.abs(child.position.y) < 1) {
                     child.visible = false;
                     onCollect();
@@ -751,16 +715,13 @@ export const HemoFlyGame = () => {
     const requiredScore = 5 + level * 2;
 
     const handleMouseMove = (e: React.MouseEvent) => {
-        // Normalize mouse to -1 to 1 range approx for movement
         const x = (e.clientX / window.innerWidth) * 2 - 1;
         const y = -(e.clientY / window.innerHeight) * 2 + 1;
-        setMousePos([x * 5, y * 3]); // Scaling for screen play area
+        setMousePos([x * 5, y * 3]); 
     };
 
     const handleCollide = () => {
-        if (!isGameOver && !showLevelComplete) {
-            setIsGameOver(true);
-        }
+        if (!isGameOver && !showLevelComplete) setIsGameOver(true);
     };
 
     const handleCollect = () => {
@@ -782,11 +743,9 @@ export const HemoFlyGame = () => {
                 <div className="flex items-center gap-2 text-neon-pink"><Bug /> Lvl {level}</div>
                 <div className="flex items-center gap-2 text-neon-cyan"><Gem /> {diamonds}</div>
             </div>
-
             <AnimatePresence>
                 {showLevelComplete && <LevelCompleteOverlay level={level} diamonds={diamonds} />}
             </AnimatePresence>
-
             {isGameOver && (
                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80">
                    <div className="text-center">
@@ -797,7 +756,6 @@ export const HemoFlyGame = () => {
                    </div>
                </div>
             )}
-
             <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
                 <DreiStars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={2} />
                 <Butterfly position={[mousePos[0], mousePos[1], 0]} />
@@ -806,6 +764,342 @@ export const HemoFlyGame = () => {
                     <Sparkles count={50} scale={10} size={2} speed={0.4} opacity={0.5} color="#bd00ff" />
                 </Float>
             </Canvas>
+        </div>
+    );
+};
+
+// --- Game 7: Neuro-Snake (Cognitive Labyrinth) ---
+export const NeuroSnakeGame = () => {
+    const { level, diamonds, showLevelComplete, isGameOver, setIsGameOver, nextLevel, resetGame } = useGameLogic();
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [score, setScore] = useState(0);
+    const [reverseControls, setReverseControls] = useState(false);
+    
+    // Game State
+    const snakeRef = useRef([{x: 10, y: 10}]);
+    const dirRef = useRef({x: 1, y: 0});
+    const foodRef = useRef({x: 5, y: 5, type: 'normal'});
+    const gameLoopRef = useRef<number | null>(null);
+    const gridSize = 20;
+    
+    useEffect(() => {
+        if (showLevelComplete || isGameOver) {
+             if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+             return;
+        }
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Reset
+        snakeRef.current = [{x: 10, y: 10}];
+        dirRef.current = {x: 1, y: 0};
+        setScore(0);
+        
+        let lastTime = 0;
+        let moveTimer = 0;
+        let reverseTimer = 0;
+        // Speed increases with level
+        const baseSpeed = Math.max(50, 150 - (level * 5));
+
+        const update = (time: number) => {
+            const dt = time - lastTime;
+            lastTime = time;
+            moveTimer += dt;
+            reverseTimer += dt;
+
+            // Reverse Control Logic (Every 10s)
+            if (reverseTimer > 10000) {
+                setReverseControls(prev => !prev);
+                reverseTimer = 0;
+            }
+
+            if (moveTimer > baseSpeed) {
+                moveTimer = 0;
+                
+                const head = {...snakeRef.current[0]};
+                head.x += dirRef.current.x;
+                head.y += dirRef.current.y;
+
+                // Warp Gates
+                const tileCountX = canvas.width / gridSize;
+                const tileCountY = canvas.height / gridSize;
+
+                if (head.x < 0) head.x = tileCountX - 1;
+                if (head.x >= tileCountX) head.x = 0;
+                if (head.y < 0) head.y = tileCountY - 1;
+                if (head.y >= tileCountY) head.y = 0;
+
+                // Self Collision
+                if (snakeRef.current.some(s => s.x === head.x && s.y === head.y)) {
+                    setIsGameOver(true);
+                    return;
+                }
+
+                snakeRef.current.unshift(head);
+
+                // Food Collision
+                if (head.x === foodRef.current.x && head.y === foodRef.current.y) {
+                     setScore(s => {
+                         const newS = s + 1;
+                         if (newS >= 10 + level) {
+                             nextLevel(20);
+                         }
+                         return newS;
+                     });
+                     // Spawn new food
+                     foodRef.current = {
+                         x: Math.floor(Math.random() * tileCountX),
+                         y: Math.floor(Math.random() * tileCountY),
+                         type: Math.random() > 0.8 ? 'speed' : 'normal'
+                     };
+                } else {
+                    snakeRef.current.pop();
+                }
+            }
+
+            // Draw
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 1;
+            for(let i=0; i<canvas.width; i+=gridSize) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+            }
+            for(let i=0; i<canvas.height; i+=gridSize) {
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
+
+            // Snake
+            snakeRef.current.forEach((seg, i) => {
+                ctx.fillStyle = i === 0 ? '#00ffff' : '#bd00ff';
+                ctx.shadowColor = i === 0 ? '#00ffff' : '#bd00ff';
+                ctx.shadowBlur = 10;
+                ctx.fillRect(seg.x * gridSize, seg.y * gridSize, gridSize - 2, gridSize - 2);
+                ctx.shadowBlur = 0;
+            });
+
+            // Food
+            ctx.fillStyle = foodRef.current.type === 'speed' ? '#ff0000' : '#00ff00';
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.arc(foodRef.current.x * gridSize + gridSize/2, foodRef.current.y * gridSize + gridSize/2, gridSize/3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            gameLoopRef.current = requestAnimationFrame(update);
+        };
+
+        gameLoopRef.current = requestAnimationFrame(update);
+        return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
+    }, [level, isGameOver, showLevelComplete]);
+
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => {
+            let newDir = { ...dirRef.current };
+            const m = reverseControls ? -1 : 1;
+            
+            if (e.key === 'ArrowUp' && dirRef.current.y === 0) newDir = { x: 0, y: -1 * m };
+            if (e.key === 'ArrowDown' && dirRef.current.y === 0) newDir = { x: 0, y: 1 * m };
+            if (e.key === 'ArrowLeft' && dirRef.current.x === 0) newDir = { x: -1 * m, y: 0 };
+            if (e.key === 'ArrowRight' && dirRef.current.x === 0) newDir = { x: 1 * m, y: 0 };
+            
+            dirRef.current = newDir;
+        };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [reverseControls]);
+
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-black relative">
+             <div className="absolute top-4 left-4 right-4 flex justify-between items-center text-white font-rajdhani z-10">
+                <div className="flex items-center gap-2 text-neon-pink"><Ghost /> Lvl {level}</div>
+                {reverseControls && <div className="text-red-500 animate-pulse font-bold">REVERSE CONTROLS!</div>}
+                <div className="flex items-center gap-2 text-neon-cyan"><Gem /> {score} / {10 + level}</div>
+            </div>
+            
+            <AnimatePresence>
+                {showLevelComplete && <LevelCompleteOverlay level={level} diamonds={diamonds} />}
+            </AnimatePresence>
+
+            {isGameOver && (
+               <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80">
+                   <div className="text-center">
+                       <h2 className="text-5xl font-orbitron text-red-600 mb-4">TERMINATED</h2>
+                       <button onClick={resetGame} className="px-8 py-3 bg-neon-cyan text-black font-bold rounded-full hover:bg-white transition-all flex items-center gap-2 mx-auto">
+                           <RotateCcw size={20} /> RESTART
+                       </button>
+                   </div>
+               </div>
+            )}
+            
+            <canvas ref={canvasRef} width={800} height={600} className="border-2 border-neon-cyan rounded-lg shadow-[0_0_20px_#00ffff] bg-gray-900 max-w-full max-h-[80vh]" />
+            <div className="mt-4 text-gray-400 font-rajdhani">Use Arrow Keys to Move. Watch out for Warp Gates!</div>
+        </div>
+    );
+};
+
+// --- Game 8: Kinetic Reflex (Bounce) ---
+export const KineticReflexGame = () => {
+    const { level, diamonds, showLevelComplete, isGameOver, setIsGameOver, nextLevel, resetGame } = useGameLogic();
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [score, setScore] = useState(0);
+    const [mirrorMode, setMirrorMode] = useState(false);
+
+    // Refs for game state
+    const paddleRef = useRef({ x: 400, width: 100 });
+    const ballsRef = useRef<any[]>([]);
+    const gameLoopRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        if (showLevelComplete || isGameOver) {
+             if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+             return;
+        }
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Init
+        ballsRef.current = [{x: 400, y: 100, vx: 2, vy: 2, type: 'normal', radius: 8}];
+        setScore(0);
+        paddleRef.current = { x: canvas.width / 2, width: 100 - (level * 2) };
+
+        let lastTime = 0;
+        let spawnTimer = 0;
+        let mirrorTimer = 0;
+
+        const update = (time: number) => {
+            const dt = time - lastTime;
+            lastTime = time;
+            spawnTimer += dt;
+            mirrorTimer += dt;
+
+            // Mirror Mode Toggle
+            if (mirrorTimer > 15000) {
+                setMirrorMode(prev => !prev);
+                mirrorTimer = 0;
+            }
+
+            // Spawn new balls
+            if (spawnTimer > Math.max(1000, 3000 - level * 100)) {
+                spawnTimer = 0;
+                ballsRef.current.push({
+                    x: Math.random() * canvas.width,
+                    y: 0,
+                    vx: (Math.random() - 0.5) * (2 + level * 0.2),
+                    vy: 2 + Math.random() * level * 0.2,
+                    type: Math.random() > 0.8 ? 'heavy' : 'normal',
+                    radius: 8
+                });
+            }
+
+            // Update Balls
+            ballsRef.current.forEach(ball => {
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+
+                // Walls
+                if (ball.x < 0 || ball.x > canvas.width) ball.vx *= -1;
+                if (ball.y < 0) ball.vy *= -1;
+
+                // Paddle Collision
+                if (ball.y + ball.radius >= canvas.height - 30 && 
+                    ball.y - ball.radius <= canvas.height - 20 &&
+                    ball.x >= paddleRef.current.x - paddleRef.current.width/2 &&
+                    ball.x <= paddleRef.current.x + paddleRef.current.width/2) {
+                        
+                        ball.vy *= -1.1; // Speed up
+                        ball.y = canvas.height - 30 - ball.radius; // unstuck
+                        setScore(s => {
+                            const newS = s + 1;
+                            if (newS >= 15 + level * 2) nextLevel(25);
+                            return newS;
+                        });
+                }
+            });
+
+            // Remove fallen balls
+            const countBefore = ballsRef.current.length;
+            ballsRef.current = ballsRef.current.filter(b => b.y < canvas.height);
+            if (ballsRef.current.length < countBefore) {
+                 setIsGameOver(true);
+            }
+
+            // Draw
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Paddle
+            ctx.fillStyle = mirrorMode ? '#ff0000' : '#00ffff';
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 20;
+            ctx.fillRect(paddleRef.current.x - paddleRef.current.width/2, canvas.height - 30, paddleRef.current.width, 10);
+            
+            // Balls
+            ballsRef.current.forEach(ball => {
+                ctx.fillStyle = ball.type === 'heavy' ? '#bd00ff' : '#ffffff';
+                ctx.shadowColor = ctx.fillStyle;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            gameLoopRef.current = requestAnimationFrame(update);
+        };
+        gameLoopRef.current = requestAnimationFrame(update);
+        return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
+    }, [level, isGameOver, showLevelComplete]);
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        
+        if (mirrorMode) {
+             x = canvasRef.current.width - x;
+        }
+        paddleRef.current.x = x;
+    };
+
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-black relative">
+            <div className="absolute top-4 left-4 right-4 flex justify-between items-center text-white font-rajdhani z-10">
+                <div className="flex items-center gap-2 text-neon-pink"><Magnet /> Lvl {level}</div>
+                {mirrorMode && <div className="text-red-500 animate-pulse font-bold">MIRROR MODE!</div>}
+                <div className="flex items-center gap-2 text-neon-cyan"><Gem /> {score} / {15 + level * 2}</div>
+            </div>
+             <AnimatePresence>
+                {showLevelComplete && <LevelCompleteOverlay level={level} diamonds={diamonds} />}
+            </AnimatePresence>
+
+            {isGameOver && (
+               <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80">
+                   <div className="text-center">
+                       <h2 className="text-5xl font-orbitron text-red-600 mb-4">BALL DROPPED</h2>
+                       <button onClick={resetGame} className="px-8 py-3 bg-neon-cyan text-black font-bold rounded-full hover:bg-white transition-all flex items-center gap-2 mx-auto">
+                           <RotateCcw size={20} /> RETRY
+                       </button>
+                   </div>
+               </div>
+            )}
+
+            <canvas 
+                ref={canvasRef} 
+                width={800} 
+                height={600} 
+                onMouseMove={handleMouseMove}
+                className="border-2 border-neon-purple rounded-lg shadow-[0_0_20px_#bd00ff] bg-gray-900 cursor-none max-w-full max-h-[80vh]" 
+            />
+            <div className="mt-4 text-gray-400 font-rajdhani">Move mouse to control paddle. Don't let balls drop!</div>
         </div>
     );
 };
